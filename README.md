@@ -36,25 +36,47 @@ The codeword contains 17 data symbols and 2 parity symbols.
 
 ### 2. Inverse-Free Decoder
 
-The decoder calculates two syndromes:
+The decoder computes two syndromes from the received codeword polynomial \(r(x)\):
 
-\[
+$$
 S_1 = r(\alpha), \qquad S_2 = r(\alpha^2)
-\]
+$$
 
-For a single-symbol error at position \(i\), the decoder identifies the error location by testing:
+where \(\alpha\) is a primitive element of the finite field \(\mathrm{GF}(2^{16})\).
 
-\[
-S_2 = S_1 \cdot \alpha^i
-\]
+For a single-symbol error at position \(i\), with error magnitude \(E\), the syndromes satisfy:
 
-The error magnitude is then computed using a constant multiplier:
+$$
+S_1 = E\alpha^i
+$$
 
-\[
-E = S_1 \cdot \alpha^{-i}
-\]
+$$
+S_2 = E\alpha^{2i}
+$$
 
-This avoids a runtime GF inverse lookup table and uses constant-GF arithmetic and comparison logic.
+Therefore, the error location can be identified by testing the equivalent relation:
+
+$$
+\boxed{S_2 = S_1\alpha^i}
+$$
+
+The decoder evaluates this condition for each valid symbol position. When the equality holds, position \(i\) is identified as the error location.
+
+Once the error position is known, the error magnitude is calculated using a constant multiplication:
+
+$$
+\boxed{E = S_1\alpha^{-i}}
+$$
+
+The erroneous symbol is corrected by XORing the received symbol with the estimated error magnitude:
+
+$$
+\boxed{c_i = r_i \oplus E}
+$$
+
+Here, \(r_i\) is the received symbol and \(c_i\) is the corrected symbol.
+
+Since \(\alpha^i\) and \(\alpha^{-i}\) are constants for each candidate position, the decoder replaces runtime GF division or inverse lookup operations with **constant-GF multiplication and comparison logic**, enabling an efficient hardware implementation.
 
 ### 3. Hardware Optimization with CSE
 
