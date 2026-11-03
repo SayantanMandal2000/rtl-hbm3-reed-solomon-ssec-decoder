@@ -1,0 +1,10 @@
+{
+ "outputs": 608,
+ "naive_xor2": 2131,
+ "naive_depth": 4,
+ "cse_shared_xor2": 178,
+ "cse_final_xor2": 10,
+ "cse_total_xor2": 188,
+ "cse_depth": 6,
+ "reduction_pct": 91.2
+}
